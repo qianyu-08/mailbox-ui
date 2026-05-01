@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MailBox UI</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: rgba(15, 23, 42, 0.72);
+      --panel-2: rgba(30, 41, 59, 0.88);
+      --card: rgba(255, 255, 255, 0.08);
+      --card-2: rgba(255, 255, 255, 0.12);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --line: rgba(148, 163, 184, 0.18);
+      --accent: #7c3aed;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --shadow: 0 20px 60px rgba(2, 6, 23, 0.45);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.45), transparent 35%),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.22), transparent 28%),
+        linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1.15fr 1.4fr;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .glass {
+      background: var(--panel);
+      backdrop-filter: blur(22px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .brand {
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #8b5cf6, #22c55e);
+      font-size: 22px;
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sidebar-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow: auto;
+    }
+
+    .compose-btn {
+      appearance: none;
+      border: 0;
+      width: 100%;
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
+      box-shadow: 0 14px 30px rgba(124, 58, 237, 0.34);
+      transition: transform .18s ease, filter .18s ease;
+    }
+
+    .compose-btn:hover { transform: translateY(-1px); filter: brightness(1.06); }
+
+    .section-title {
+      margin: 8px 4px 2px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
+    }
+
+    .nav-item, .label-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      cursor: pointer;
+      color: var(--text);
+      background: transparent;
+      transition: background .18s ease, transform .18s ease;
+      user-select: none;
+    }
+
+    .nav-item:hover, .label-item:hover, .nav-item.active, .label-item.active {
+      background: var(--card);
+      transform: translateX(2px);
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.08);
+      font-size: 14px;
+    }
+
+    .badge {
+      min-width: 26px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(124, 58, 237, 0.22);
+      color: #ddd6fe;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .stats {
+      margin-top: auto;
+      padding: 16px;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 18px;
+      background: var(--card);
+    }
+    .stat strong { display:block; font-size: 20px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+
+    .list-pane, .reader-pane {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .topbar {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid transparent;
+    }
+
+    .search input {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      outline: 0;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .search input::placeholder { color: #94a3b8; }
+
+    .filters {
+      padding: 14px 18px 0;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(255,255,255,0.03);
+      padding: 9px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background .18s ease, color .18s ease, transform .18s ease;
+      font-size: 13px;
+    }
+    .chip.active {
+      background: rgba(124, 58, 237, 0.2);
+      color: white;
+    }
+    .chip:hover { transform: translateY(-1px); }
+
+    .mail-list {
+      padding: 10px;
+      overflow: auto;
+      display: grid;
+      gap: 10px;
+    }
+
+    .mail-item {
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid transparent;
+      background: rgba(255,255,255,0.04);
+      cursor: pointer;
+      transition: transform .16s ease, background .16s ease, border-color .16s ease;
+    }
+    .mail-item:hover { transform: translateY(-1px); background: rgba(255,255,255,0.07); }
+    .mail-item.active { border-color: rgba(124, 58, 237, 0.65); background: rgba(124, 58, 237, 0.16); }
+
+    .mail-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .sender {
+      font-weight: 700;
+      margin: 0 0 6px;
+      font-size: 15px;
+    }
+    .subject {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.45;
+      color: #e2e8f0;
+    }
+    .snippet {
+      margin: 8px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      white-space: nowrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .tag {
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    .tag.work { background: rgba(59, 130, 246, .18); color: #bfdbfe; }
+    .tag.personal { background: rgba(34, 197, 94, .16); color: #bbf7d0; }
+    .tag.alert { background: rgba(239, 68, 68, .18); color: #fecaca; }
+    .tag.design { background: rgba(168, 85, 247, .18); color: #e9d5ff; }
+
+    .reader-head {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .reader-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: background .16s ease, transform .16s ease;
+    }
+    .action-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.08); }
+
+    .reader {
+      padding: 22px;
+      overflow: auto;
+    }
+
+    .reader h2 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    .reader-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: white;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      flex: 0 0 auto;
+    }
+
+    .message {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .message-body {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      line-height: 1.8;
+      color: #e5e7eb;
+    }
+
+    .message-body p { margin: 0 0 12px; }
+    .message-body p:last-child { margin-bottom: 0; }
+
+    .signature {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .empty {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+      padding: 24px;
+    }
+
+    .empty-card {
+      max-width: 320px;
+      padding: 28px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
+    }
+
+    .compose-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 30;
+    }
+
+    .compose-modal.open { display: flex; }
+
+    .compose {
+      width: min(860px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98));
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow: var(--shadow);
+    }
+
+    .compose-head {
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .compose-head h3 { margin: 0; font-size: 18px; }
+    .close-btn {
+      border: 0;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .compose-body {
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+    }
+
+    .field input, .field textarea, .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 16px;
+      color: var(--text);
+      padding: 13px 14px;
+      outline: 0;
+      font: inherit;
+    }
+
+    .field textarea {
+      min-height: 220px;
+      resize: vertical;
+      line-height: 1.7;
+    }
+
+    .compose-footer {
+      padding: 0 20px 20px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .secondary {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .send-btn {
+      border: 0;
+      border-radius: 16px;
+      padding: 13px 18px;
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-2), #16a34a);
+    }
+
+    @media (max-width: 1100px) {
+      body { overflow: auto; }
+      .app {
+        height: auto;
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+      }
+      .sidebar { order: 1; }
+      .list-pane { order: 2; min-height: 620px; }
+      .reader-pane { order: 3; min-height: 560px; }
+    }
+
+    @media (max-width: 640px) {
+      .app { padding: 10px; gap: 10px; }
+      .topbar, .reader-head, .brand { padding-left: 14px; padding-right: 14px; }
+      .reader { padding: 16px; }
+      .compose-body, .compose-footer { padding-left: 14px; padding-right: 14px; }
+      .brand { gap: 12px; }
+      .search { width: 100%; }
+      .topbar { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar glass">
+      <div class="brand">
+        <div class="brand-mark">✉</div>
+        <div>
+          <h1>MailBox</h1>
+          <p>シンプルで使いやすいメールアプリ</p>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <button class="compose-btn" id="openCompose">＋ 新規作成</button>
+
+        <div>
+          <div class="section-title">Folders</div>
+          <div class="nav-item active" data-folder="inbox"><span class="nav-left"><span class="icon">📥</span>受信箱</span><span class="badge">8</span></div>
+          <div class="nav-item" data-folder="sent"><span class="nav-left"><span class="icon">📤</span>送信済み</span><span class="badge">12</span></div>
+          <div class="nav-item" data-folder="drafts"><span class="nav-left"><span class="icon">📝</span>下書き</span><span class="badge">3</span></div>
+          <div class="nav-item" data-folder="trash"><span class="nav-left"><span class="icon">🗑️</span>ゴミ箱</span><span class="badge">1</span></div>
+        </div>
+
+        <div>
+          <div class="section-title">Labels</div>
+          <div class="label-item active" data-label="all"><span class="nav-left"><span class="icon">✨</span>すべて</span></div>
+          <div class="label-item" data-label="work"><span class="nav-left"><span class="icon">💼</span>仕事</span></div>
+          <div class="label-item" data-label="personal"><span class="nav-left"><span class="icon">👤</span>個人</span></div>
+          <div class="label-item" data-label="design"><span class="nav-left"><span class="icon">🎨</span>デザイン</span></div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <strong id="unreadCount">8</strong>
+          <span>未読</span>
+        </div>
+        <div class="stat">
+          <strong>98%</strong>
+          <span>稼働率</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="list-pane glass">
+      <div class="topbar">
+        <div class="search">
+          <span>⌕</span>
+          <input id="searchInput" type="text" placeholder="メールを検索..." />
+        </div>
+        <button class="action-btn" id="markAllRead">既読にする</button>
+      </div>
+
+      <div class="filters">
+        <button class="chip active" data-filter="all">すべて</button>
+        <button class="chip" data-filter="unread">未読</button>
+        <button class="chip" data-filter="starred">スター付き</button>
+        <button class="chip" data-filter="today">今日</button>
+      </div>
+
+      <div class="mail-list" id="mailList"></div>
+    </section>
+
+    <section class="reader-pane glass">
+      <div class="reader-head">
+        <div>
+          <div style="color:var(--muted); font-size:12px; margin-bottom:4px;">プレビュー</div>
+          <div style="font-weight:700;">選択したメール</div>
+        </div>
+        <div class="reader-actions">
+          <button class="action-btn" id="replyBtn">返信</button>
+          <button class="action-btn" id="archiveBtn">アーカイブ</button>
+          <button class="action-btn" id="deleteBtn">削除</button>
+        </div>
+      </div>
+      <div class="reader" id="reader"></div>
+    </section>
+  </div>
+
+  <div class="compose-modal" id="composeModal" aria-hidden="true">
+    <div class="compose">
+      <div class="compose-head">
+        <h3>新規メール作成</h3>
+        <button class="close-btn" id="closeCompose">×</button>
+      </div>
+      <div class="compose-body">
+        <div class="field">
+          <label>宛先</label>
+          <input type="email" placeholder="example@mail.com" />
+        </div>
+        <div class="field">
+          <label>件名</label>
+          <input type="text" placeholder="件名を入力" />
+        </div>
+        <div class="field">
+          <label>ラベル</label>
+          <select>
+            <option>仕事</option>
+            <option>個人</option>
+            <option>デザイン</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>本文</label>
+          <textarea placeholder="ここに本文を書いてください..."></textarea>
+        </div>
+      </div>
+      <div class="compose-footer">
+        <div class="secondary">下書きとして保存するだけでも、ずいぶん人類らしい気分になります。</div>
+        <button class="send-btn" id="sendBtn">送信する</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const mails = [
+      {
+        id: 1,
+        sender: 'Yamada / Product Team',
+        email: 'product@company.jp',
+        subject: '来週のリリーススケジュールについて',
+        snippet: 'UIの最終確認をお願いします。素材の差し替えは明日15時までに反映できると助かります。',
+        time: '09:24',
+        date: '今日',
+        label: 'work',
+        tag: 'work',
+        unread: true,
+        starred: true,
+        body: [
+          'こんにちは。',
+          '来週公開予定の画面について、最終レビューをお願いしたいです。特にボタンの配置とモバイル表示の崩れがないかを見てください。',
+          '差し戻しがあれば今日中に共有できると助かります。よろしくお願いします。'
+        ]
+      },
+      {
+        id: 2,
+        sender: 'Design Lab',
+        email: 'hello@designlab.studio',
+        subject: '新しいカラーパレット案を送ります',
+        snippet: '彩度を少し抑えた案と、ビビッド寄りの案を2パターン用意しました。',
+        time: '08:10',
+        date: '今日',
+        label: 'design',
+        tag: 'design',
+        unread: true,
+        starred: false,
+        body: [
+          'いつもありがとうございます。',
+          '今回の提案では、深いネイビーをベースにした落ち着いた案と、アクセントを強めた活発な案をまとめています。',
+          'レビューしやすいように、ワイヤーと併記した資料も添付しています。'
+        ]
+      },
+      {
+        id: 3,
+        sender: 'Sato',
+        email: 'sato@example.com',
+        subject: '週末の予定、どうする？',
+        snippet: '駅近のカフェをいくつか見つけました。集合は昼前でも大丈夫です。',
+        time: '昨日',
+        date: '昨日',
+        label: 'personal',
+        tag: 'personal',
+        unread: false,
+        starred: true,
+        body: [
+          'やあ。',
+          '週末の予定、まだ空いていたらカフェに行こうと思っています。',
+          '駅から近い場所をいくつか見つけたので、都合のいい方を選んでもらえたらうれしいです。'
+        ]
+      },
+      {
+        id: 4,
+        sender: 'Security Alert',
+        email: 'no-reply@security.jp',
+        subject: '新しい端末からのログインがありました',
+        snippet: '心当たりがない場合は、すぐにパスワードを変更してください。',
+        time: '1時間前',
+        date: '今日',
+        label: 'alert',
+        tag: 'alert',
+        unread: true,
+        starred: false,
+        body: [
+          '新しい端末からのログインを検知しました。',
+          '心当たりがない場合は、アカウント設定からパスワードを変更し、二段階認証を有効にしてください。',
+          'この通知に返信する必要はありません。'
+        ]
+      },
+      {
+        id: 5,
+        sender: 'Nakamura',
+        email: 'naka@example.com',
+        subject: '資料の確認ありがとうございました',
+        snippet: '改善点の指摘、すごく助かりました。次の版に反映します。',
+        time: '月曜',
+        date: '月曜',
+        label: 'work',
+        tag: 'work',
+        unread: false,
+        starred: false,
+        body: [
+          'レビューありがとうございました。',
+          'いただいたフィードバックをもとに、次の版では可読性と余白を調整します。',
+          '引き続きよろしくお願いします。'
+        ]
+      }
+    ];
+
+    const state = {
+      activeId: 1,
+      filter: 'all',
+      folder: 'inbox',
+      label: 'all',
+      query: ''
+    };
+
+    const mailList = document.getElementById('mailList');
+    const reader = document.getElementById('reader');
+    const unreadCount = document.getElementById('unreadCount');
+    const searchInput = document.getElementById('searchInput');
+    const composeModal = document.getElementById('composeModal');
+
+    function initials(name) {
+      return name.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
+    }
+
+    function updateUnreadCount() {
+      unreadCount.textContent = mails.filter(m => m.unread).length;
+    }
+
+    function matchesFilter(mail) {
+      const q = state.query.trim().toLowerCase();
+      const matchesQuery = !q || [mail.sender, mail.subject, mail.snippet, mail.email].join(' ').toLowerCase().includes(q);
+      const matchesLabel = state.label === 'all' || mail.label === state.label;
+      const matchesChip =
+        state.filter === 'all' ||
+        (state.filter === 'unread' && mail.unread) ||
+        (state.filter === 'starred' && mail.starred) ||
+        (state.filter === 'today' && mail.date === '今日');
+      return matchesQuery && matchesLabel && matchesChip;
+    }
+
+    function renderList() {
+      const visible = mails.filter(matchesFilter);
+      mailList.innerHTML = visible.map(mail => `
+        <article class="mail-item ${mail.id === state.activeId ? 'active' : ''}" data-id="${mail.id}">
+          <div class="mail-row">
+            <div style="min-width:0;">
+              <p class="sender">${mail.sender} ${mail.unread ? '<span style="color:#a78bfa;">•</span>' : ''}</p>
+              <p class="subject">${mail.subject}</p>
+              <p class="snippet">${mail.snippet}</p>
+            </div>
+            <div class="meta">
+              <span>${mail.time}</span>
+              <span class="tag ${mail.tag}">${mail.label}</span>
+            </div>
+          </div>
+        </article>
+      `).join('') || `
+        <div class="empty">
+          <div class="empty-card">
+            <div style="font-size:42px; margin-bottom:10px;">📭</div>
+            <h3 style="margin:0 0 8px; color:var(--text);">該当するメールがありません</h3>
+            <p style="margin:0; line-height:1.7;">検索語やフィルタを変えると、だいたい人間っぽい成功体験が戻ってきます。</p>
+          </div>
+        </div>
+      `;
+
+      mailList.querySelectorAll('.mail-item').forEach(item => {
+        item.addEventListener('click', () => {
+          state.activeId = Number(item.dataset.id);
+          const mail = mails.find(m => m.id === state.activeId);
+          if (mail) mail.unread = false;
+          updateUnreadCount();
+          renderAll();
+        });
+      });
+    }
+
+    function renderReader() {
+      const mail = mails.find(m => m.id === state.activeId) || mails[0];
+      if (!mail) {
+        reader.innerHTML = '<div class="empty"><div class="empty-card">メールがありません。</div></div>';
+        return;
+      }
+
+      reader.innerHTML = `
+        <h2>${mail.subject}</h2>
+        <div class="reader-info">
+          <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+            <div class="avatar">${initials(mail.sender)}</div>
+            <div style="min-width:0;">
+              <div style="font-weight:700; color:var(--text);">${mail.sender}</div>
+              <div>${mail.email}</div>
+            </div>
+          </div>
+          <div>${mail.date} ・ ${mail.time}</div>
+        </div>
+        <div class="message">
+          <div class="message-body">
+            ${mail.body.map(p => `<p>${p}</p>`).join('')}
+            <div class="signature">
+              送信元: ${mail.sender}<br />
+              ラベル: ${mail.label}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      renderList();
+      renderReader();
+      document.querySelectorAll('.chip').forEach(chip => chip.classList.toggle('active', chip.dataset.filter === state.filter));
+      document.querySelectorAll('.label-item').forEach(item => item.classList.toggle('active', item.dataset.label === state.label));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.folder === state.folder));
+    }
+
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        state.filter = chip.dataset.filter;
+        renderAll();
+      });
+    });
+
+    document.querySelectorAll('.label-item').forEach(item => {
+      item.addEventListener('click', () => {
+        state.label = item.dataset.label;
+        renderAll();
+      });
+    });
+
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        state.folder = item.dataset.folder;
+        renderAll();
+      });
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      state.query = e.target.value;
+      renderAll();
+    });
+
+    document.getElementById('markAllRead').addEventListener('click', () => {
+      mails.forEach(m => m.unread = false);
+      updateUnreadCount();
+      renderAll();
+    });
+
+    document.getElementById('replyBtn').addEventListener('click', () => {
+      composeModal.classList.add('open');
+      composeModal.setAttribute('aria-hidden', 'false');
+    });
+    document.getElementById('openCompose').addEventListener('click', () => {
+      composeModal.classList.add('open');
+      composeModal.setAttribute('aria-hidden', 'false');
+    });
+    document.getElementById('closeCompose').addEventListener('click', closeCompose);
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      alert('送信しました。人類のやることにしては珍しく、わりとスムーズです。');
+      closeCompose();
+    });
+    document.getElementById('deleteBtn').addEventListener('click', () => {
+      const idx = mails.findIndex(m => m.id === state.activeId);
+      if (idx >= 0) {
+        mails.splice(idx, 1);
+        state.activeId = mails[0]?.id || null;
+        updateUnreadCount();
+        renderAll();
+      }
+    });
+    document.getElementById('archiveBtn').addEventListener('click', () => {
+      alert('アーカイブしました。散らかった現実は、たまに片付けると少しマシです。');
+    });
+
+    composeModal.addEventListener('click', (e) => {
+      if (e.target === composeModal) closeCompose();
+    });
+
+    function closeCompose() {
+      composeModal.classList.remove('open');
+      composeModal.setAttribute('aria-hidden', 'true');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeCompose();
+    });
+
+    updateUnreadCount();
+    renderAll();
+  </script>
+</body>
+</html>
