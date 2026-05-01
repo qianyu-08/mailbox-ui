@@ -10,11 +10,10 @@ GitHub Pagesでそのまま公開できる構成になっています。
 
 GitHub Pagesで公開後、ここにURLを追加してください：
 
-```
+
 
 [https://qianyu-08.github.io/mailbox-ui/](https://qianyu-08.github.io/mailbox-ui/)
 
-```
 
 ---
 
