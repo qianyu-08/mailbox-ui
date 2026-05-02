@@ -54,6 +54,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      min-height: 0;
     }
 
     .brand {
@@ -62,6 +63,7 @@
       display: flex;
       gap: 14px;
       align-items: center;
+      flex: 0 0 auto;
     }
 
     .brand-mark {
@@ -93,6 +95,8 @@
       flex-direction: column;
       gap: 14px;
       overflow: auto;
+      min-height: 0;
+      flex: 1 1 auto;
     }
 
     .compose-btn {
@@ -167,6 +171,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+      flex: 0 0 auto;
     }
 
     .stat {
@@ -177,10 +182,54 @@
     .stat strong { display:block; font-size: 20px; }
     .stat span { color: var(--muted); font-size: 12px; }
 
+    .profile-card {
+      margin: 0 16px 16px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 0 0 auto;
+    }
+
+    .profile-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      color: white;
+      background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+      box-shadow: 0 12px 28px rgba(59, 130, 246, 0.25);
+      flex: 0 0 auto;
+    }
+
+    .profile-meta {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .profile-meta .name {
+      font-weight: 800;
+      font-size: 14px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+
+    .profile-meta .role {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
     .list-pane, .reader-pane {
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      min-height: 0;
     }
 
     .topbar {
@@ -190,6 +239,7 @@
       gap: 12px;
       align-items: center;
       justify-content: space-between;
+      flex: 0 0 auto;
     }
 
     .search {
@@ -219,6 +269,7 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      flex: 0 0 auto;
     }
 
     .chip {
@@ -242,6 +293,8 @@
       overflow: auto;
       display: grid;
       gap: 10px;
+      min-height: 0;
+      flex: 1 1 auto;
     }
 
     .mail-item {
@@ -308,6 +361,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      flex: 0 0 auto;
     }
 
     .reader-actions {
@@ -329,6 +383,8 @@
     .reader {
       padding: 22px;
       overflow: auto;
+      min-height: 0;
+      flex: 1 1 auto;
     }
 
     .reader h2 {
@@ -526,6 +582,7 @@
       .brand { gap: 12px; }
       .search { width: 100%; }
       .topbar { flex-direction: column; align-items: stretch; }
+      .profile-card { margin: 0 14px 14px; }
     }
   </style>
 </head>
@@ -568,6 +625,14 @@
         <div class="stat">
           <strong>98%</strong>
           <span>稼働率</span>
+        </div>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-avatar">QY</div>
+        <div class="profile-meta">
+          <div class="name">Qianyu Yang</div>
+          <div class="role">WEB制作担当</div>
         </div>
       </div>
     </aside>
@@ -751,7 +816,7 @@
     const composeModal = document.getElementById('composeModal');
 
     function initials(name) {
-      return name.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
+      return name.split(' ').map(s => s[0]).slice(0, 2).join('').toUpperCase();
     }
 
     function updateUnreadCount() {
