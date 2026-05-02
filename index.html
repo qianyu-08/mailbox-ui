@@ -3,94 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MailBox UI - Business</title>
+  <title>MailBox UI</title>
   <style>
     :root {
-      --bg: #f3f6fb;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --surface-3: #eef3f9;
-      --text: #1f2937;
-      --muted: #64748b;
-      --line: #d7e0ea;
-      --line-2: #c7d2de;
-      --accent: #2563eb;
-      --accent-2: #0f766e;
-      --danger: #dc2626;
-      --warning: #b45309;
-      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-      --radius: 16px;
-      --radius-sm: 12px;
-      --sidebar: #f8fbff;
-      --toolbar: #ffffff;
-      --list-selected: #e8f0ff;
-      --chip: #eff4fa;
+      --bg: #0f172a;
+      --panel: rgba(15, 23, 42, 0.72);
+      --panel-2: rgba(30, 41, 59, 0.88);
+      --card: rgba(255, 255, 255, 0.08);
+      --card-2: rgba(255, 255, 255, 0.12);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --line: rgba(148, 163, 184, 0.18);
+      --accent: #7c3aed;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --shadow: 0 20px 60px rgba(2, 6, 23, 0.45);
+      --radius: 22px;
     }
 
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
       margin: 0;
-      font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        linear-gradient(180deg, #edf3fb 0%, #f5f8fc 38%, #eef3f9 100%);
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.45), transparent 35%),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.22), transparent 28%),
+        linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
       overflow: hidden;
-    }
-
-    button, input, select, textarea {
-      font: inherit;
     }
 
     .app {
       height: 100vh;
       display: grid;
-      grid-template-columns: 290px 390px 1fr;
-      gap: 14px;
-      padding: 14px;
+      grid-template-columns: 280px 1.15fr 1.4fr;
+      gap: 16px;
+      padding: 16px;
     }
 
-    .panel {
-      background: var(--surface);
+    .glass {
+      background: var(--panel);
+      backdrop-filter: blur(22px);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      overflow: hidden;
-      min-width: 0;
     }
 
     .sidebar {
       display: flex;
       flex-direction: column;
-      background: linear-gradient(180deg, #fbfdff 0%, #f6f9fd 100%);
+      overflow: hidden;
     }
 
     .brand {
-      padding: 18px 18px 14px;
+      padding: 22px;
       border-bottom: 1px solid var(--line);
       display: flex;
+      gap: 14px;
       align-items: center;
-      gap: 12px;
-      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
     }
 
     .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 13px;
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, #1d4ed8, #2563eb);
-      color: #fff;
-      font-size: 20px;
-      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+      background: linear-gradient(135deg, #8b5cf6, #22c55e);
+      font-size: 22px;
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35);
     }
 
     .brand h1 {
       margin: 0;
-      font-size: 16px;
+      font-size: 18px;
       line-height: 1.2;
-      letter-spacing: .01em;
     }
 
     .brand p {
@@ -99,97 +87,83 @@
       color: var(--muted);
     }
 
-    .sidebar-body {
-      padding: 14px;
+    .sidebar-content {
+      padding: 16px;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      min-height: 0;
+      overflow: auto;
     }
 
     .compose-btn {
       appearance: none;
       border: 0;
       width: 100%;
-      border-radius: 12px;
-      padding: 13px 14px;
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 15px;
       font-weight: 700;
       color: white;
-      background: linear-gradient(135deg, var(--accent), #1d4ed8);
-      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.18);
       cursor: pointer;
-      transition: transform .15s ease, filter .15s ease;
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
+      box-shadow: 0 14px 30px rgba(124, 58, 237, 0.34);
+      transition: transform .18s ease, filter .18s ease;
     }
-    .compose-btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
 
-    .group-title {
-      margin: 0 0 8px;
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: .12em;
+    .compose-btn:hover { transform: translateY(-1px); filter: brightness(1.06); }
+
+    .section-title {
+      margin: 8px 4px 2px;
+      font-size: 12px;
       text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--muted);
     }
 
-    .nav-list {
-      display: grid;
-      gap: 6px;
-    }
-
-    .nav-item {
-      width: 100%;
+    .nav-item, .label-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--text);
-      padding: 11px 12px;
-      border-radius: 12px;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
       cursor: pointer;
-      transition: background .15s ease, border-color .15s ease, transform .15s ease;
-      text-align: left;
+      color: var(--text);
+      background: transparent;
+      transition: background .18s ease, transform .18s ease;
+      user-select: none;
     }
 
-    .nav-item:hover, .nav-item.active {
-      background: var(--surface-2);
-      border-color: var(--line);
-      transform: translateX(1px);
+    .nav-item:hover, .label-item:hover, .nav-item.active, .label-item.active {
+      background: var(--card);
+      transform: translateX(2px);
     }
 
-    .nav-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
     .icon {
-      width: 26px;
-      height: 26px;
-      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
       display: grid;
       place-items: center;
-      background: var(--chip);
-      color: #334155;
-      font-size: 13px;
-      flex: 0 0 auto;
-    }
-    .nav-label {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      background: rgba(255,255,255,0.08);
+      font-size: 14px;
     }
 
     .badge {
       min-width: 26px;
-      padding: 4px 8px;
+      padding: 4px 9px;
       border-radius: 999px;
-      background: #e8eef8;
-      color: #334155;
+      background: rgba(124, 58, 237, 0.22);
+      color: #ddd6fe;
       font-size: 12px;
       text-align: center;
-      flex: 0 0 auto;
     }
 
     .stats {
       margin-top: auto;
+      padding: 16px;
       border-top: 1px solid var(--line);
-      padding-top: 14px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
@@ -197,28 +171,25 @@
 
     .stat {
       padding: 14px;
-      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-      border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: 18px;
+      background: var(--card);
     }
-    .stat strong { display:block; font-size: 20px; line-height: 1.1; }
-    .stat span { display:block; margin-top: 4px; font-size: 12px; color: var(--muted); }
+    .stat strong { display:block; font-size: 20px; }
+    .stat span { color: var(--muted); font-size: 12px; }
 
     .list-pane, .reader-pane {
       display: flex;
       flex-direction: column;
-      min-width: 0;
-      min-height: 0;
-      background: var(--surface);
+      overflow: hidden;
     }
 
     .topbar {
-      padding: 14px;
+      padding: 18px;
       border-bottom: 1px solid var(--line);
       display: flex;
+      gap: 12px;
       align-items: center;
-      gap: 10px;
-      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      justify-content: space-between;
     }
 
     .search {
@@ -227,91 +198,62 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      background: var(--surface-2);
-      border-radius: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid transparent;
     }
 
-    .search span { color: var(--muted); }
     .search input {
       width: 100%;
+      background: transparent;
       border: 0;
       outline: 0;
-      background: transparent;
       color: var(--text);
+      font-size: 14px;
     }
     .search input::placeholder { color: #94a3b8; }
 
-    .toolbar-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .action-btn {
-      border: 1px solid var(--line);
-      background: #fff;
-      color: #334155;
-      border-radius: 10px;
-      padding: 10px 12px;
-      cursor: pointer;
-      transition: background .15s ease, transform .15s ease, border-color .15s ease;
-      box-shadow: 0 1px 0 rgba(15,23,42,.02);
-    }
-    .action-btn:hover { background: #f8fbff; transform: translateY(-1px); border-color: var(--line-2); }
-
     .filters {
-      padding: 12px 14px 0;
+      padding: 14px 18px 0;
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
     }
 
     .chip {
       border: 1px solid var(--line);
-      background: var(--chip);
-      color: #334155;
-      padding: 8px 11px;
+      color: var(--muted);
+      background: rgba(255,255,255,0.03);
+      padding: 9px 12px;
       border-radius: 999px;
       cursor: pointer;
+      transition: background .18s ease, color .18s ease, transform .18s ease;
       font-size: 13px;
-      transition: background .15s ease, transform .15s ease, color .15s ease;
+    }
+    .chip.active {
+      background: rgba(124, 58, 237, 0.2);
+      color: white;
     }
     .chip:hover { transform: translateY(-1px); }
-    .chip.active {
-      background: #dbeafe;
-      color: #1d4ed8;
-      border-color: #bfdbfe;
-    }
 
     .mail-list {
       padding: 10px;
       overflow: auto;
       display: grid;
-      gap: 8px;
+      gap: 10px;
     }
 
     .mail-item {
+      padding: 16px;
+      border-radius: 18px;
       border: 1px solid transparent;
-      border-radius: 14px;
-      background: #fff;
-      padding: 14px;
+      background: rgba(255,255,255,0.04);
       cursor: pointer;
-      transition: background .15s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+      transition: transform .16s ease, background .16s ease, border-color .16s ease;
     }
-
-    .mail-item:hover {
-      background: #fcfdff;
-      transform: translateY(-1px);
-      border-color: #dbe5f0;
-      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
-    }
-
-    .mail-item.active {
-      background: var(--list-selected);
-      border-color: #c7dcff;
-    }
+    .mail-item:hover { transform: translateY(-1px); background: rgba(255,255,255,0.07); }
+    .mail-item.active { border-color: rgba(124, 58, 237, 0.65); background: rgba(124, 58, 237, 0.16); }
 
     .mail-row {
       display: flex;
@@ -320,34 +262,23 @@
       align-items: flex-start;
     }
 
-    .mail-main { min-width: 0; }
-
     .sender {
-      margin: 0 0 5px;
-      font-size: 14px;
       font-weight: 700;
-      color: #0f172a;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
+      margin: 0 0 6px;
+      font-size: 15px;
     }
-
     .subject {
       margin: 0;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1.45;
-      color: #1f2937;
-      font-weight: 600;
+      color: #e2e8f0;
     }
-
     .snippet {
-      margin: 7px 0 0;
-      font-size: 12.5px;
-      line-height: 1.6;
+      margin: 8px 0 0;
+      font-size: 13px;
       color: var(--muted);
+      line-height: 1.5;
     }
-
     .meta {
       display: flex;
       flex-direction: column;
@@ -356,77 +287,65 @@
       white-space: nowrap;
       color: var(--muted);
       font-size: 12px;
-      flex: 0 0 auto;
     }
 
     .tag {
-      padding: 5px 9px;
+      padding: 5px 10px;
       border-radius: 999px;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: .02em;
-      border: 1px solid transparent;
+      letter-spacing: .03em;
     }
-    .tag.work { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
-    .tag.personal { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-    .tag.design { background: #f3e8ff; color: #7e22ce; border-color: #e9d5ff; }
-    .tag.alert { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+    .tag.work { background: rgba(59, 130, 246, .18); color: #bfdbfe; }
+    .tag.personal { background: rgba(34, 197, 94, .16); color: #bbf7d0; }
+    .tag.alert { background: rgba(239, 68, 68, .18); color: #fecaca; }
+    .tag.design { background: rgba(168, 85, 247, .18); color: #e9d5ff; }
 
     .reader-head {
-      padding: 14px;
+      padding: 18px;
       border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
     }
-
-    .reader-title {
-      display: grid;
-      gap: 3px;
-    }
-    .reader-title small { color: var(--muted); font-size: 12px; }
-    .reader-title strong { font-size: 15px; }
 
     .reader-actions {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
     }
+    .action-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: background .16s ease, transform .16s ease;
+    }
+    .action-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.08); }
 
     .reader {
       padding: 22px;
       overflow: auto;
-      min-height: 0;
     }
 
     .reader h2 {
-      margin: 0 0 12px;
-      font-size: 26px;
-      line-height: 1.3;
-      letter-spacing: -.01em;
-      color: #0f172a;
+      margin: 0 0 10px;
+      font-size: 24px;
+      line-height: 1.25;
     }
 
     .reader-info {
       display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
       align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
       color: var(--muted);
       font-size: 13px;
-      margin-bottom: 18px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .sender-block {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
     }
 
     .avatar {
@@ -437,47 +356,32 @@
       place-items: center;
       font-weight: 800;
       color: white;
-      background: linear-gradient(135deg, #1d4ed8, #0f766e);
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
       flex: 0 0 auto;
-      box-shadow: 0 10px 18px rgba(29, 78, 216, 0.16);
-    }
-
-    .sender-meta {
-      min-width: 0;
-    }
-
-    .sender-meta .name {
-      font-weight: 700;
-      color: #0f172a;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .message {
       display: flex;
       gap: 14px;
       align-items: flex-start;
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
     .message-body {
-      width: 100%;
       padding: 18px;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(148, 163, 184, 0.12);
       line-height: 1.8;
-      color: #334155;
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+      color: #e5e7eb;
     }
 
     .message-body p { margin: 0 0 12px; }
     .message-body p:last-child { margin-bottom: 0; }
 
     .signature {
-      margin-top: 18px;
-      padding-top: 14px;
+      margin-top: 22px;
+      padding-top: 16px;
       border-top: 1px solid var(--line);
       color: var(--muted);
       font-size: 13px;
@@ -487,82 +391,75 @@
       height: 100%;
       display: grid;
       place-items: center;
-      padding: 24px;
       color: var(--muted);
       text-align: center;
+      padding: 24px;
     }
 
     .empty-card {
-      max-width: 340px;
-      padding: 24px;
-      border-radius: 18px;
-      border: 1px dashed var(--line-2);
-      background: #fbfdff;
+      max-width: 320px;
+      padding: 28px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--line);
     }
 
     .compose-modal {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.38);
+      background: rgba(2, 6, 23, 0.6);
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 18px;
       z-index: 30;
-      backdrop-filter: blur(6px);
     }
 
     .compose-modal.open { display: flex; }
 
     .compose {
-      width: min(900px, 100%);
-      max-height: 92vh;
+      width: min(860px, 100%);
+      max-height: 90vh;
       overflow: auto;
-      border-radius: 20px;
-      background: #fff;
-      border: 1px solid var(--line);
-      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.18);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98));
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow: var(--shadow);
     }
 
     .compose-head {
-      padding: 16px 18px;
+      padding: 18px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--line);
-      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
     }
 
-    .compose-head h3 {
-      margin: 0;
-      font-size: 16px;
-    }
-
+    .compose-head h3 { margin: 0; font-size: 18px; }
     .close-btn {
-      border: 1px solid var(--line);
-      background: #fff;
-      color: #334155;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      border: 0;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
       cursor: pointer;
       font-size: 20px;
     }
 
     .compose-body {
-      padding: 18px;
+      padding: 20px;
       display: grid;
       gap: 14px;
-      background: #fff;
     }
 
     .field {
       display: grid;
-      gap: 7px;
+      gap: 8px;
     }
 
     .field label {
-      font-size: 11px;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: .08em;
       color: var(--muted);
@@ -570,18 +467,13 @@
 
     .field input, .field textarea, .field select {
       width: 100%;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 16px;
       color: var(--text);
-      padding: 12px 13px;
+      padding: 13px 14px;
       outline: 0;
-      transition: border-color .15s ease, box-shadow .15s ease;
-    }
-
-    .field input:focus, .field textarea:focus, .field select:focus {
-      border-color: #93c5fd;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+      font: inherit;
     }
 
     .field textarea {
@@ -591,13 +483,12 @@
     }
 
     .compose-footer {
-      padding: 0 18px 18px;
+      padding: 0 20px 20px;
       display: flex;
       justify-content: space-between;
       gap: 12px;
       align-items: center;
       flex-wrap: wrap;
-      background: #fff;
     }
 
     .secondary {
@@ -607,30 +498,15 @@
 
     .send-btn {
       border: 0;
-      border-radius: 12px;
-      padding: 12px 18px;
+      border-radius: 16px;
+      padding: 13px 18px;
       color: white;
-      font-weight: 700;
       cursor: pointer;
-      background: linear-gradient(135deg, var(--accent-2), #115e59);
-      box-shadow: 0 10px 18px rgba(15, 118, 110, 0.18);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-2), #16a34a);
     }
 
-    .muted-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #f59e0b;
-      display: inline-block;
-      flex: 0 0 auto;
-    }
-
-    .empty-state-icon {
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
-
-    @media (max-width: 1120px) {
+    @media (max-width: 1100px) {
       body { overflow: auto; }
       .app {
         height: auto;
@@ -638,101 +514,93 @@
         grid-template-columns: 1fr;
       }
       .sidebar { order: 1; }
-      .list-pane { order: 2; min-height: 640px; }
+      .list-pane { order: 2; min-height: 620px; }
       .reader-pane { order: 3; min-height: 560px; }
     }
 
     @media (max-width: 640px) {
       .app { padding: 10px; gap: 10px; }
-      .topbar, .reader-head, .brand { padding-left: 12px; padding-right: 12px; }
+      .topbar, .reader-head, .brand { padding-left: 14px; padding-right: 14px; }
       .reader { padding: 16px; }
-      .compose-body, .compose-footer { padding-left: 12px; padding-right: 12px; }
+      .compose-body, .compose-footer { padding-left: 14px; padding-right: 14px; }
+      .brand { gap: 12px; }
+      .search { width: 100%; }
       .topbar { flex-direction: column; align-items: stretch; }
-      .toolbar-actions { width: 100%; }
-      .action-btn { flex: 1; }
-      .reader-info { align-items: flex-start; }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <aside class="sidebar panel">
+    <aside class="sidebar glass">
       <div class="brand">
         <div class="brand-mark">✉</div>
         <div>
           <h1>MailBox</h1>
-          <p>Business mail workspace</p>
+          <p>シンプルで使いやすいメールアプリ</p>
         </div>
       </div>
 
-      <div class="sidebar-body">
-        <button class="compose-btn" id="openCompose">＋ New Message</button>
+      <div class="sidebar-content">
+        <button class="compose-btn" id="openCompose">＋ 新規作成</button>
 
         <div>
-          <div class="group-title">Folders</div>
-          <div class="nav-list">
-            <button class="nav-item active" data-folder="inbox"><span class="nav-left"><span class="icon">📥</span><span class="nav-label">受信トレイ</span></span><span class="badge">8</span></button>
-            <button class="nav-item" data-folder="sent"><span class="nav-left"><span class="icon">📤</span><span class="nav-label">送信済み</span></span><span class="badge">12</span></button>
-            <button class="nav-item" data-folder="drafts"><span class="nav-left"><span class="icon">📝</span><span class="nav-label">下書き</span></span><span class="badge">3</span></button>
-            <button class="nav-item" data-folder="trash"><span class="nav-left"><span class="icon">🗑️</span><span class="nav-label">削除済み</span></span><span class="badge">1</span></button>
-          </div>
+          <div class="section-title">Folders</div>
+          <div class="nav-item active" data-folder="inbox"><span class="nav-left"><span class="icon">📥</span>受信箱</span><span class="badge">8</span></div>
+          <div class="nav-item" data-folder="sent"><span class="nav-left"><span class="icon">📤</span>送信済み</span><span class="badge">12</span></div>
+          <div class="nav-item" data-folder="drafts"><span class="nav-left"><span class="icon">📝</span>下書き</span><span class="badge">3</span></div>
+          <div class="nav-item" data-folder="trash"><span class="nav-left"><span class="icon">🗑️</span>ゴミ箱</span><span class="badge">1</span></div>
         </div>
 
         <div>
-          <div class="group-title">Labels</div>
-          <div class="nav-list">
-            <button class="nav-item active" data-label="all"><span class="nav-left"><span class="icon">✨</span><span class="nav-label">すべて</span></span></button>
-            <button class="nav-item" data-label="work"><span class="nav-left"><span class="icon">💼</span><span class="nav-label">仕事</span></span></button>
-            <button class="nav-item" data-label="personal"><span class="nav-left"><span class="icon">👤</span><span class="nav-label">個人</span></span></button>
-            <button class="nav-item" data-label="design"><span class="nav-left"><span class="icon">🎨</span><span class="nav-label">デザイン</span></span></button>
-          </div>
+          <div class="section-title">Labels</div>
+          <div class="label-item active" data-label="all"><span class="nav-left"><span class="icon">✨</span>すべて</span></div>
+          <div class="label-item" data-label="work"><span class="nav-left"><span class="icon">💼</span>仕事</span></div>
+          <div class="label-item" data-label="personal"><span class="nav-left"><span class="icon">👤</span>個人</span></div>
+          <div class="label-item" data-label="design"><span class="nav-left"><span class="icon">🎨</span>デザイン</span></div>
         </div>
+      </div>
 
-        <div class="stats">
-          <div class="stat">
-            <strong id="unreadCount">8</strong>
-            <span>未読</span>
-          </div>
-          <div class="stat">
-            <strong>98%</strong>
-            <span>稼働率</span>
-          </div>
+      <div class="stats">
+        <div class="stat">
+          <strong id="unreadCount">8</strong>
+          <span>未読</span>
+        </div>
+        <div class="stat">
+          <strong>98%</strong>
+          <span>稼働率</span>
         </div>
       </div>
     </aside>
 
-    <section class="list-pane panel">
+    <section class="list-pane glass">
       <div class="topbar">
         <div class="search">
           <span>⌕</span>
-          <input id="searchInput" type="text" placeholder="検索: 件名、差出人、本文" />
+          <input id="searchInput" type="text" placeholder="メールを検索..." />
         </div>
-        <div class="toolbar-actions">
-          <button class="action-btn" id="markAllRead">Mark all read</button>
-          <button class="action-btn" id="refreshBtn">Refresh</button>
-        </div>
+        <button class="action-btn" id="markAllRead">既読にする</button>
       </div>
 
       <div class="filters">
-        <button class="chip active" data-filter="all">All</button>
-        <button class="chip" data-filter="unread">Unread</button>
-        <button class="chip" data-filter="starred">Starred</button>
-        <button class="chip" data-filter="today">Today</button>
+        <button class="chip active" data-filter="all">すべて</button>
+        <button class="chip" data-filter="unread">未読</button>
+        <button class="chip" data-filter="starred">スター付き</button>
+        <button class="chip" data-filter="today">今日</button>
       </div>
 
       <div class="mail-list" id="mailList"></div>
     </section>
 
-    <section class="reader-pane panel">
+    <section class="reader-pane glass">
       <div class="reader-head">
-        <div class="reader-title">
-          <small>Preview</small>
-          <strong>選択したメール</strong>
+        <div>
+          <div style="color:var(--muted); font-size:12px; margin-bottom:4px;">プレビュー</div>
+          <div style="font-weight:700;">選択したメール</div>
         </div>
         <div class="reader-actions">
-          <button class="action-btn" id="replyBtn">Reply</button>
-          <button class="action-btn" id="archiveBtn">Archive</button>
-          <button class="action-btn" id="deleteBtn">Delete</button>
+          <button class="action-btn" id="replyBtn">返信</button>
+          <button class="action-btn" id="archiveBtn">アーカイブ</button>
+          <button class="action-btn" id="deleteBtn">削除</button>
         </div>
       </div>
       <div class="reader" id="reader"></div>
@@ -740,7 +608,7 @@
   </div>
 
   <div class="compose-modal" id="composeModal" aria-hidden="true">
-    <div class="compose" role="dialog" aria-modal="true" aria-label="新規メール作成">
+    <div class="compose">
       <div class="compose-head">
         <h3>新規メール作成</h3>
         <button class="close-btn" id="closeCompose">×</button>
@@ -748,7 +616,7 @@
       <div class="compose-body">
         <div class="field">
           <label>宛先</label>
-          <input type="email" placeholder="example@company.com" />
+          <input type="email" placeholder="example@mail.com" />
         </div>
         <div class="field">
           <label>件名</label>
@@ -764,12 +632,12 @@
         </div>
         <div class="field">
           <label>本文</label>
-          <textarea placeholder="本文を入力してください..."></textarea>
+          <textarea placeholder="ここに本文を書いてください..."></textarea>
         </div>
       </div>
       <div class="compose-footer">
-        <div class="secondary">下書きでも送信でも、どちらでも業務は進みます。人類は締切でしか整わないので。</div>
-        <button class="send-btn" id="sendBtn">Send</button>
+        <div class="secondary">下書きとして保存するだけでも、ずいぶん人類らしい気分になります。</div>
+        <button class="send-btn" id="sendBtn">送信する</button>
       </div>
     </div>
   </div>
@@ -799,7 +667,7 @@
         sender: 'Design Lab',
         email: 'hello@designlab.studio',
         subject: '新しいカラーパレット案を送ります',
-        snippet: '彩度を抑えた案と、少しアクセントを強めた案を2パターン用意しました。',
+        snippet: '彩度を少し抑えた案と、ビビッド寄りの案を2パターン用意しました。',
         time: '08:10',
         date: '今日',
         label: 'design',
@@ -808,8 +676,8 @@
         starred: false,
         body: [
           'いつもありがとうございます。',
-          '今回の提案では、落ち着いたネイビー系の案と、アクセントを強めた案をまとめています。',
-          '比較しやすいように、ワイヤーと併記した資料も添付しています。'
+          '今回の提案では、深いネイビーをベースにした落ち着いた案と、アクセントを強めた活発な案をまとめています。',
+          'レビューしやすいように、ワイヤーと併記した資料も添付しています。'
         ]
       },
       {
@@ -883,14 +751,7 @@
     const composeModal = document.getElementById('composeModal');
 
     function initials(name) {
-      return name
-        .replace(/\//g, ' ')
-        .split(/\s+/)
-        .filter(Boolean)
-        .map(s => s[0])
-        .slice(0, 2)
-        .join('')
-        .toUpperCase();
+      return name.split(' ').map(s => s[0]).slice(0,2).join('').toUpperCase();
     }
 
     function updateUnreadCount() {
@@ -914,11 +775,8 @@
       mailList.innerHTML = visible.map(mail => `
         <article class="mail-item ${mail.id === state.activeId ? 'active' : ''}" data-id="${mail.id}">
           <div class="mail-row">
-            <div class="mail-main">
-              <p class="sender">
-                ${mail.sender}
-                ${mail.unread ? '<span class="muted-dot" title="未読"></span>' : ''}
-              </p>
+            <div style="min-width:0;">
+              <p class="sender">${mail.sender} ${mail.unread ? '<span style="color:#a78bfa;">•</span>' : ''}</p>
               <p class="subject">${mail.subject}</p>
               <p class="snippet">${mail.snippet}</p>
             </div>
@@ -931,9 +789,9 @@
       `).join('') || `
         <div class="empty">
           <div class="empty-card">
-            <div class="empty-state-icon">📭</div>
-            <h3 style="margin:0 0 8px; color:#0f172a;">該当するメールがありません</h3>
-            <p style="margin:0; line-height:1.7;">検索語かフィルタを変えると、たぶん業務っぽい画面に戻ります。</p>
+            <div style="font-size:42px; margin-bottom:10px;">📭</div>
+            <h3 style="margin:0 0 8px; color:var(--text);">該当するメールがありません</h3>
+            <p style="margin:0; line-height:1.7;">検索語やフィルタを変えると、だいたい人間っぽい成功体験が戻ってきます。</p>
           </div>
         </div>
       `;
@@ -959,10 +817,10 @@
       reader.innerHTML = `
         <h2>${mail.subject}</h2>
         <div class="reader-info">
-          <div class="sender-block">
+          <div style="display:flex; align-items:center; gap:12px; min-width:0;">
             <div class="avatar">${initials(mail.sender)}</div>
-            <div class="sender-meta">
-              <div class="name">${mail.sender}</div>
+            <div style="min-width:0;">
+              <div style="font-weight:700; color:var(--text);">${mail.sender}</div>
               <div>${mail.email}</div>
             </div>
           </div>
@@ -980,16 +838,12 @@
       `;
     }
 
-    function syncActiveButtons() {
-      document.querySelectorAll('.chip').forEach(chip => chip.classList.toggle('active', chip.dataset.filter === state.filter));
-      document.querySelectorAll('.nav-item[data-label]').forEach(item => item.classList.toggle('active', item.dataset.label === state.label));
-      document.querySelectorAll('.nav-item[data-folder]').forEach(item => item.classList.toggle('active', item.dataset.folder === state.folder));
-    }
-
     function renderAll() {
       renderList();
       renderReader();
-      syncActiveButtons();
+      document.querySelectorAll('.chip').forEach(chip => chip.classList.toggle('active', chip.dataset.filter === state.filter));
+      document.querySelectorAll('.label-item').forEach(item => item.classList.toggle('active', item.dataset.label === state.label));
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.dataset.folder === state.folder));
     }
 
     document.querySelectorAll('.chip').forEach(chip => {
@@ -999,14 +853,14 @@
       });
     });
 
-    document.querySelectorAll('.nav-item[data-label]').forEach(item => {
+    document.querySelectorAll('.label-item').forEach(item => {
       item.addEventListener('click', () => {
         state.label = item.dataset.label;
         renderAll();
       });
     });
 
-    document.querySelectorAll('.nav-item[data-folder]').forEach(item => {
+    document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', () => {
         state.folder = item.dataset.folder;
         renderAll();
@@ -1024,21 +878,19 @@
       renderAll();
     });
 
-    document.getElementById('refreshBtn').addEventListener('click', () => {
-      state.query = '';
-      searchInput.value = '';
-      renderAll();
+    document.getElementById('replyBtn').addEventListener('click', () => {
+      composeModal.classList.add('open');
+      composeModal.setAttribute('aria-hidden', 'false');
     });
-
-    document.getElementById('replyBtn').addEventListener('click', () => openCompose());
-    document.getElementById('openCompose').addEventListener('click', () => openCompose());
+    document.getElementById('openCompose').addEventListener('click', () => {
+      composeModal.classList.add('open');
+      composeModal.setAttribute('aria-hidden', 'false');
+    });
     document.getElementById('closeCompose').addEventListener('click', closeCompose);
-
     document.getElementById('sendBtn').addEventListener('click', () => {
-      alert('送信しました。珍しく、かなり業務アプリっぽい挙動です。');
+      alert('送信しました。人類のやることにしては珍しく、わりとスムーズです。');
       closeCompose();
     });
-
     document.getElementById('deleteBtn').addEventListener('click', () => {
       const idx = mails.findIndex(m => m.id === state.activeId);
       if (idx >= 0) {
@@ -1048,28 +900,22 @@
         renderAll();
       }
     });
-
     document.getElementById('archiveBtn').addEventListener('click', () => {
-      alert('アーカイブしました。画面は片付きましたが、仕事は片付いていません。');
+      alert('アーカイブしました。散らかった現実は、たまに片付けると少しマシです。');
     });
 
     composeModal.addEventListener('click', (e) => {
       if (e.target === composeModal) closeCompose();
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeCompose();
-    });
-
-    function openCompose() {
-      composeModal.classList.add('open');
-      composeModal.setAttribute('aria-hidden', 'false');
-    }
-
     function closeCompose() {
       composeModal.classList.remove('open');
       composeModal.setAttribute('aria-hidden', 'true');
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeCompose();
+    });
 
     updateUnreadCount();
     renderAll();
