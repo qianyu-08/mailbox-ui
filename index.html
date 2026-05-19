@@ -1,1074 +1,658 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MailBox - Gmail Style</title>
+  <title>メールアプリ風UI</title>
   <style>
     :root {
-      --bg: #f6f8fc;
-      --surface: #ffffff;
-      --surface-2: #f1f3f4;
-      --line: #e0e3e7;
-      --text: #202124;
-      --muted: #5f6368;
-      --blue: #1a73e8;
-      --blue-2: #d2e3fc;
-      --red: #d93025;
-      --green: #188038;
-      --shadow: 0 1px 2px rgba(60,64,67,.08), 0 4px 12px rgba(60,64,67,.12);
-      --radius: 18px;
-      --sidebar-w: 260px;
-      --reader-w: 420px;
+      --bg: #f3f5f7;
+      --panel: rgba(255, 255, 255, 0.88);
+      --panel-solid: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --accent: #4f46e5;
+      --accent-2: #eef2ff;
+      --success: #10b981;
+      --shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+      --radius: 22px;
     }
 
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif;
       color: var(--text);
-    }
-
-    button, input, textarea, select { font: inherit; }
-    button { cursor: pointer; }
-    :focus-visible {
-      outline: 2px solid var(--blue);
-      outline-offset: 2px;
+      background:
+        radial-gradient(circle at top left, #dbeafe 0%, transparent 28%),
+        radial-gradient(circle at top right, #ede9fe 0%, transparent 26%),
+        linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      overflow: hidden;
     }
 
     .app {
-      display: grid;
-      grid-template-rows: 64px 1fr;
       height: 100vh;
+      padding: 18px;
     }
 
-    .topbar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 0 16px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .icon-btn {
-      width: 40px;
-      height: 40px;
-      border: 0;
-      border-radius: 50%;
-      background: transparent;
+    .shell {
+      height: 100%;
       display: grid;
-      place-items: center;
-      color: var(--muted);
-      font-size: 18px;
+      grid-template-columns: 280px 360px 1fr;
+      gap: 16px;
+      padding: 16px;
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.55);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
-    .icon-btn:hover { background: var(--surface-2); }
+
+    .sidebar, .list, .reader {
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(229,231,235,0.9);
+      border-radius: var(--radius);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      padding: 18px;
+      gap: 18px;
+    }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      min-width: 0;
-      margin-right: 6px;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 0.02em;
     }
-    .brand-mark {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #1a73e8, #8ab4f8);
-      color: white;
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
       display: grid;
       place-items: center;
-      font-weight: 800;
-      flex: 0 0 auto;
-    }
-    .brand strong {
-      font-size: 16px;
-      letter-spacing: .2px;
+      color: white;
+      font-size: 1.2rem;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      box-shadow: 0 10px 24px rgba(79,70,229,0.28);
     }
 
-    .searchbar {
-      flex: 1;
-      min-width: 0;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 16px;
-      border-radius: 999px;
-      background: #eef3fb;
-      border: 1px solid transparent;
-    }
-    .searchbar:focus-within {
-      background: var(--surface);
-      border-color: transparent;
-      box-shadow: var(--shadow);
-    }
-    .searchbar input {
+    .compose {
       border: 0;
-      background: transparent;
-      width: 100%;
-      outline: none;
-      color: var(--text);
-      font-size: 15px;
-    }
-    .searchbar input::placeholder { color: #6f757b; }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: auto;
-    }
-
-    .workspace {
-      display: grid;
-      grid-template-columns: var(--sidebar-w) 1fr var(--reader-w);
-      min-height: 0;
-    }
-
-    .sidebar {
-      background: transparent;
-      padding: 16px 8px 16px 12px;
-      min-height: 0;
-      overflow: auto;
-    }
-
-    .compose-btn {
-      width: 144px;
-      height: 56px;
-      border: 0;
-      border-radius: 18px;
-      background: #c2e7ff;
-      color: #001d35;
-      box-shadow: var(--shadow);
+      background: linear-gradient(135deg, var(--accent), #7c3aed);
+      color: white;
+      padding: 14px 16px;
+      border-radius: 16px;
+      font-size: 0.98rem;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 18px;
+      cursor: pointer;
+      box-shadow: 0 14px 26px rgba(79,70,229,0.22);
     }
-    .compose-btn:hover { filter: brightness(0.98); }
 
-    .nav-section {
+    .nav, .labels {
       display: grid;
-      gap: 4px;
-      margin-bottom: 18px;
+      gap: 8px;
     }
 
     .section-title {
-      color: var(--muted);
-      font-size: 12px;
+      font-size: 0.8rem;
       text-transform: uppercase;
-      letter-spacing: .08em;
-      padding: 14px 14px 6px;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-top: 2px;
     }
 
-    .nav-item {
+    .nav-item, .label-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      height: 40px;
-      padding: 0 14px;
-      border-radius: 0 20px 20px 0;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
       color: var(--text);
-      border: 0;
       background: transparent;
-      width: 100%;
-      text-align: left;
     }
-    .nav-item:hover { background: #edf1f5; }
+
     .nav-item.active {
-      background: #d3e3fd;
+      background: var(--accent-2);
+      border: 1px solid rgba(79,70,229,0.14);
+      color: var(--accent);
       font-weight: 700;
     }
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-    .nav-left span.label {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .nav-icon {
-      width: 20px;
-      text-align: center;
-      color: var(--muted);
-      flex: 0 0 auto;
-    }
-    .nav-item.active .nav-icon { color: var(--blue); }
+
     .count {
+      font-size: 0.82rem;
       color: var(--muted);
-      font-size: 12px;
-      min-width: 22px;
-      text-align: right;
-    }
-
-    .labels {
-      margin-top: 8px;
-      padding: 0 8px;
-      display: grid;
-      gap: 4px;
-    }
-
-    .label-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      width: fit-content;
-      margin: 6px 8px 0;
-      padding: 7px 11px;
+      background: rgba(255,255,255,0.7);
+      padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid var(--line);
-      background: var(--surface);
-      color: var(--muted);
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .label-chip.active {
-      background: #e8f0fe;
-      color: #174ea6;
-      border-color: #d2e3fc;
     }
 
-    .content {
-      display: grid;
-      grid-template-rows: auto auto 1fr;
-      min-width: 0;
-      min-height: 0;
-      border-left: 1px solid var(--line);
-      border-right: 1px solid var(--line);
-      background: var(--surface);
+    .storage {
+      margin-top: auto;
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+      border: 1px solid rgba(147,197,253,0.35);
     }
 
-    .mail-toolbar {
+    .storage-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.85);
+      overflow: hidden;
+      margin: 12px 0 8px;
+    }
+
+    .storage-bar span {
+      display: block;
+      width: 68%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    }
+
+    .list {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px 16px;
+      flex-direction: column;
+    }
+
+    .list-head, .reader-head {
+      padding: 18px 18px 14px;
       border-bottom: 1px solid var(--line);
-      background: rgba(255,255,255,.9);
-      backdrop-filter: blur(10px);
-      position: sticky;
-      top: 64px;
-      z-index: 5;
+      background: rgba(255,255,255,0.55);
     }
 
-    .toolbar-left, .toolbar-right {
+    .title-row {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      min-width: 0;
+      gap: 12px;
     }
 
-    .toolbar-btn {
-      height: 36px;
-      padding: 0 12px;
-      border-radius: 10px;
+    h1, h2, h3, p { margin: 0; }
+
+    .search {
+      margin-top: 14px;
+      position: relative;
+    }
+
+    .search input {
+      width: 100%;
       border: 1px solid var(--line);
-      background: white;
+      background: rgba(255,255,255,0.92);
+      border-radius: 14px;
+      padding: 13px 14px 13px 42px;
+      font-size: 0.95rem;
+      outline: none;
       color: var(--text);
     }
-    .toolbar-btn:hover { background: #f8f9fa; }
 
-    .pill-group {
+    .search::before {
+      content: "⌕";
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+    .filter-row {
       display: flex;
-      align-items: center;
       gap: 8px;
+      margin-top: 12px;
       flex-wrap: wrap;
     }
 
     .chip {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--muted);
       padding: 8px 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.8);
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 0.84rem;
+      color: var(--muted);
     }
+
     .chip.active {
-      background: #e8f0fe;
-      color: #174ea6;
-      border-color: #d2e3fc;
+      color: var(--accent);
+      background: var(--accent-2);
+      border-color: rgba(79,70,229,0.18);
+      font-weight: 700;
     }
 
-    .mail-list {
-      min-height: 0;
+    .messages {
       overflow: auto;
-      padding: 8px;
-      background: linear-gradient(#fff, #fff) padding-box;
-    }
-
-    .mail-item {
+      padding: 10px;
       display: grid;
-      grid-template-columns: 20px 1fr auto;
-      gap: 12px;
-      align-items: start;
-      padding: 14px 12px;
-      border-bottom: 1px solid #eef1f3;
-      cursor: pointer;
-      border-radius: 12px;
+      gap: 10px;
     }
-    .mail-item:hover { background: #f8faff; }
-    .mail-item.active { background: #e8f0fe; }
 
-    .check {
-      width: 18px;
-      height: 18px;
-      border-radius: 4px;
-      border: 1px solid #c7cdd1;
-      background: white;
-      margin-top: 3px;
+    .message {
+      border: 1px solid transparent;
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255,255,255,0.72);
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .message:hover, .message.selected {
+      transform: translateY(-1px);
+      border-color: rgba(79,70,229,0.16);
+      background: #fff;
+      box-shadow: 0 14px 28px rgba(15,23,42,0.07);
+    }
+
+    .message-top, .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sender {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 700;
       flex: 0 0 auto;
     }
 
-    .mail-main {
+    .avatar.blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+    .avatar.purple { background: linear-gradient(135deg, #8b5cf6, #c084fc); }
+    .avatar.green { background: linear-gradient(135deg, #10b981, #34d399); }
+    .avatar.orange { background: linear-gradient(135deg, #f59e0b, #fb923c); }
+
+    .sender-info {
       min-width: 0;
     }
-    .mail-row1 {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: baseline;
-      margin-bottom: 4px;
-    }
-    .sender {
-      font-weight: 700;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .time {
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    .subject {
-      font-size: 14px;
-      line-height: 1.4;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .snippet {
-      margin-top: 2px;
-      font-size: 13px;
-      color: var(--muted);
+
+    .sender-info strong, .subject, .preview {
+      display: block;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .badges {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-      padding-left: 6px;
+    .sender-info strong {
+      font-size: 0.95rem;
     }
-    .star {
-      color: #d9a400;
-      font-size: 16px;
-      line-height: 1;
+
+    .time, .preview, .meta, .small {
+      color: var(--muted);
+      font-size: 0.84rem;
     }
-    .mail-tag {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
+
+    .subject {
+      margin-top: 8px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .03em;
+      font-size: 0.95rem;
     }
-    .mail-tag.work { background: #e8f0fe; color: #174ea6; }
-    .mail-tag.personal { background: #e6f4ea; color: #137333; }
-    .mail-tag.design { background: #f3e8fd; color: #8e24aa; }
-    .mail-tag.alert { background: #fce8e6; color: #c5221f; }
+
+    .preview {
+      margin-top: 6px;
+      line-height: 1.45;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      color: var(--accent);
+      background: var(--accent-2);
+    }
 
     .reader {
-      min-width: 0;
-      min-height: 0;
-      background: #fff;
-      display: grid;
-      grid-template-rows: auto 1fr;
-    }
-    .reader-head {
-      padding: 18px 18px 14px;
-      border-bottom: 1px solid var(--line);
       display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .reader-title {
+      flex-direction: column;
       min-width: 0;
     }
-    .reader-title .kicker {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
-    .reader-title h2 {
-      margin: 0;
-      font-size: 22px;
-      line-height: 1.25;
-    }
-    .reader-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .reader-btn {
-      border: 1px solid var(--line);
-      background: white;
-      color: var(--text);
-      border-radius: 10px;
-      height: 36px;
-      padding: 0 12px;
-    }
-    .reader-btn:hover { background: #f8f9fa; }
 
     .reader-body {
       padding: 18px;
       overflow: auto;
-      min-height: 0;
-    }
-
-    .meta-line {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .sender-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1a73e8, #8ab4f8);
-      color: white;
+      flex: 1;
       display: grid;
-      place-items: center;
-      font-weight: 800;
-      flex: 0 0 auto;
-    }
-    .sender-meta {
-      min-width: 0;
-    }
-    .sender-meta strong {
-      display: block;
-      font-size: 14px;
-      margin-bottom: 2px;
-    }
-    .sender-meta span {
-      color: var(--muted);
-      font-size: 12px;
+      gap: 16px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.78)),
+        radial-gradient(circle at top right, rgba(199,210,254,0.45), transparent 24%);
     }
 
-    .message-box {
-      padding: 18px;
+    .mail-card {
       border: 1px solid var(--line);
-      border-radius: 18px;
-      background: #f8fafd;
-      line-height: 1.85;
-    }
-    .message-box p { margin: 0 0 12px; }
-    .message-box p:last-child { margin-bottom: 0; }
-
-    .signature {
-      margin-top: 18px;
-      padding-top: 16px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 13px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+      padding: 18px;
     }
 
-    .empty {
-      height: 100%;
-      display: grid;
-      place-items: center;
-      color: var(--muted);
-      text-align: center;
-      padding: 24px;
-    }
-    .empty-card {
-      max-width: 320px;
-      padding: 28px;
-      border: 1px dashed #d0d7de;
-      border-radius: 24px;
-      background: #fbfcfe;
-    }
-
-    .compose-fab {
-      position: fixed;
-      right: 24px;
-      bottom: 24px;
-      border: 0;
-      border-radius: 18px;
-      height: 56px;
-      padding: 0 18px;
+    .hero {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #c2e7ff;
-      color: #001d35;
-      box-shadow: var(--shadow);
-      font-weight: 700;
-      z-index: 12;
-    }
-
-    .compose-modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      align-items: end;
-      justify-content: end;
-      background: rgba(32,33,36,.18);
-      z-index: 30;
-      padding: 24px;
-    }
-    .compose-modal.open { display: flex; }
-    .compose {
-      width: min(680px, 100%);
-      height: min(86vh, 760px);
-      background: white;
-      border-radius: 18px;
-      box-shadow: 0 12px 28px rgba(60,64,67,.25);
-      overflow: hidden;
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-    }
-    .compose-head,
-    .compose-footer {
-      display: flex;
-      align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 16px 18px;
-      border-bottom: 1px solid var(--line);
+      align-items: flex-start;
     }
-    .compose-footer { border-bottom: 0; border-top: 1px solid var(--line); }
-    .compose-head h3 { margin: 0; font-size: 16px; }
-    .close-btn {
-      width: 36px;
-      height: 36px;
-      border: 0;
-      border-radius: 50%;
-      background: transparent;
-      font-size: 20px;
-      color: var(--muted);
-    }
-    .compose-body {
-      padding: 16px 18px 18px;
-      display: grid;
-      gap: 12px;
-      overflow: auto;
-      min-height: 0;
-    }
-    .field {
-      display: grid;
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #ecfeff;
+      color: #0f766e;
+      font-weight: 700;
+      font-size: 0.82rem;
     }
-    .field label {
-      font-size: 12px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .08em;
+
+    .body-text {
+      line-height: 1.8;
+      color: #374151;
+      font-size: 0.97rem;
     }
-    .field input, .field textarea, .field select {
-      width: 100%;
+
+    .attachment-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .attachment {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: #f8fafc;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: white;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: white;
+      border-color: transparent;
+    }
+
+    .composer {
+      border-top: 1px solid var(--line);
+      padding: 14px 18px 18px;
+      background: rgba(255,255,255,0.72);
+    }
+
+    .composer-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .composer input {
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 13px 14px;
-      background: #fff;
-      color: var(--text);
+      font-size: 0.95rem;
+      background: white;
       outline: none;
+      width: 100%;
     }
-    .field textarea {
-      min-height: 240px;
-      resize: vertical;
-      line-height: 1.7;
-    }
-    .compose-send {
+
+    .send {
+      padding: 13px 18px;
       border: 0;
-      border-radius: 999px;
-      height: 40px;
-      padding: 0 18px;
-      background: var(--blue);
+      border-radius: 14px;
+      background: linear-gradient(135deg, #10b981, #059669);
       color: white;
       font-weight: 700;
-    }
-    .secondary-note {
-      color: var(--muted);
-      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
     }
 
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-thumb { background: #c7cdd1; border-radius: 999px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-
-    @media (max-width: 1180px) {
-      .workspace { grid-template-columns: var(--sidebar-w) 1fr; }
-      .reader { display: none; }
-    }
-
-    @media (max-width: 840px) {
-      .app { grid-template-rows: 60px 1fr; }
-      .workspace { grid-template-columns: 1fr; }
-      .sidebar { display: none; }
-      .topbar { gap: 10px; padding: 0 10px; }
-      .brand strong { display: none; }
-      .top-actions { gap: 4px; }
-      .searchbar { height: 44px; }
-      .compose-fab { right: 16px; bottom: 16px; }
-      .compose-modal { padding: 10px; align-items: stretch; justify-content: stretch; }
-      .compose { width: 100%; height: 100%; border-radius: 18px; }
+    @media (max-width: 1100px) {
+      body { overflow: auto; }
+      .app { height: auto; }
+      .shell { grid-template-columns: 1fr; height: auto; }
+      .sidebar, .list, .reader { min-height: 0; }
+      .attachment-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <header class="topbar">
-      <button class="icon-btn" id="menuBtn" aria-label="メニュー">☰</button>
-      <div class="brand">
-        <div class="brand-mark">M</div>
-        <strong>MailBox</strong>
-      </div>
-      <div class="searchbar">
-        <span style="color:#5f6368">⌕</span>
-        <input id="searchInput" type="text" placeholder="メールを検索" />
-      </div>
-      <div class="top-actions">
-        <button class="icon-btn" title="ヘルプ">?</button>
-        <button class="icon-btn" title="設定">⚙</button>
-        <button class="icon-btn" title="アカウント">◯</button>
-      </div>
-    </header>
-
-    <main class="workspace">
+    <div class="shell">
       <aside class="sidebar">
-        <button class="compose-btn" id="openCompose">✎  作成</button>
-
-        <div class="nav-section">
-          <button class="nav-item active" data-folder="inbox">
-            <span class="nav-left"><span class="nav-icon">📥</span><span class="label">受信トレイ</span></span>
-            <span class="count" id="inboxCount">8</span>
-          </button>
-          <button class="nav-item" data-folder="starred">
-            <span class="nav-left"><span class="nav-icon">⭐</span><span class="label">スター付き</span></span>
-            <span class="count" id="starCount">2</span>
-          </button>
-          <button class="nav-item" data-folder="sent">
-            <span class="nav-left"><span class="nav-icon">📤</span><span class="label">送信済み</span></span>
-            <span class="count">12</span>
-          </button>
-          <button class="nav-item" data-folder="drafts">
-            <span class="nav-left"><span class="nav-icon">📝</span><span class="label">下書き</span></span>
-            <span class="count">3</span>
-          </button>
-          <button class="nav-item" data-folder="trash">
-            <span class="nav-left"><span class="nav-icon">🗑️</span><span class="label">ゴミ箱</span></span>
-            <span class="count">1</span>
-          </button>
+        <div class="brand">
+          <div class="logo">✉</div>
+          <div>
+            <div>MailBox Pro</div>
+            <div class="small">メールアプリ風UI</div>
+          </div>
         </div>
 
-        <div class="section-title">ラベル</div>
+        <button class="compose">＋ 新規作成</button>
+
+        <div class="nav">
+          <div class="section-title">フォルダ</div>
+          <div class="nav-item active"><span>受信トレイ</span><span class="count">12</span></div>
+          <div class="nav-item"><span>スター付き</span><span class="count">4</span></div>
+          <div class="nav-item"><span>送信済み</span><span class="count">31</span></div>
+          <div class="nav-item"><span>下書き</span><span class="count">2</span></div>
+          <div class="nav-item"><span>ゴミ箱</span><span class="count">8</span></div>
+        </div>
+
         <div class="labels">
-          <button class="label-chip active" data-label="all">すべて</button>
-          <button class="label-chip" data-label="work">仕事</button>
-          <button class="label-chip" data-label="personal">個人</button>
-          <button class="label-chip" data-label="design">デザイン</button>
-          <button class="label-chip" data-label="alert">重要</button>
+          <div class="section-title">ラベル</div>
+          <div class="label-item"><span>仕事</span><span class="count">18</span></div>
+          <div class="label-item"><span>学校</span><span class="count">7</span></div>
+          <div class="label-item"><span>通知</span><span class="count">20</span></div>
+        </div>
+
+        <div class="storage">
+          <div class="small">ストレージ使用量</div>
+          <div style="font-weight:700; font-size:1.2rem; margin-top:4px;">6.8 GB / 10 GB</div>
+          <div class="storage-bar"><span></span></div>
+          <div class="small">あと少しで人類おなじみの容量不足です</div>
         </div>
       </aside>
 
-      <section class="content">
-        <div class="mail-toolbar">
-          <div class="toolbar-left">
-            <button class="toolbar-btn" id="selectAllBtn">☐</button>
-            <button class="toolbar-btn" id="markAllRead">既読</button>
-            <button class="toolbar-btn" id="archiveBtn">アーカイブ</button>
-            <button class="toolbar-btn" id="deleteBtn">削除</button>
+      <section class="list">
+        <div class="list-head">
+          <div class="title-row">
+            <div>
+              <h2>受信トレイ</h2>
+              <p class="small">今日の新着メッセージ 12件</p>
+            </div>
+            <div class="badge">● オンライン</div>
           </div>
-          <div class="toolbar-right pill-group">
-            <button class="chip active" data-filter="all">すべて</button>
-            <button class="chip" data-filter="unread">未読</button>
-            <button class="chip" data-filter="starred">スター付き</button>
-            <button class="chip" data-filter="today">今日</button>
+
+          <div class="search">
+            <input type="text" placeholder="メールを検索" />
+          </div>
+
+          <div class="filter-row">
+            <div class="chip active">すべて</div>
+            <div class="chip">未読</div>
+            <div class="chip">重要</div>
+            <div class="chip">添付あり</div>
           </div>
         </div>
 
-        <div class="mail-list" id="mailList"></div>
+        <div class="messages">
+          <article class="message selected">
+            <div class="message-top">
+              <div class="sender">
+                <div class="avatar blue">A</div>
+                <div class="sender-info">
+                  <strong>Acme Team</strong>
+                  <div class="small">project@acme.example</div>
+                </div>
+              </div>
+              <div class="time">09:41</div>
+            </div>
+            <div class="subject">新しいダッシュボードのデザイン案を確認してください</div>
+            <div class="preview">週次レビューの前に、最新のワイヤーフレームと配色案を共有します。フィードバックをお願いします。</div>
+            <div class="tag">重要</div>
+          </article>
+
+          <article class="message">
+            <div class="message-top">
+              <div class="sender">
+                <div class="avatar purple">M</div>
+                <div class="sender-info">
+                  <strong>Mika</strong>
+                  <div class="small">mika@school.example</div>
+                </div>
+              </div>
+              <div class="time">08:12</div>
+            </div>
+            <div class="subject">明日の資料、共有フォルダに入れてあります</div>
+            <div class="preview">プレゼン用のPDFと画像をまとめました。確認したら教えてください。</div>
+          </article>
+
+          <article class="message">
+            <div class="message-top">
+              <div class="sender">
+                <div class="avatar green">S</div>
+                <div class="sender-info">
+                  <strong>Support</strong>
+                  <div class="small">help@service.example</div>
+                </div>
+              </div>
+              <div class="time">昨日</div>
+            </div>
+            <div class="subject">パスワードのリセットが完了しました</div>
+            <div class="preview">アカウントの安全性を保つため、定期的な更新をおすすめしています。</div>
+          </article>
+
+          <article class="message">
+            <div class="message-top">
+              <div class="sender">
+                <div class="avatar orange">N</div>
+                <div class="sender-info">
+                  <strong>Newsletter</strong>
+                  <div class="small">news@weekly.example</div>
+                </div>
+              </div>
+              <div class="time">昨日</div>
+            </div>
+            <div class="subject">今週の注目アップデートまとめ</div>
+            <div class="preview">開発ツール、デザイン、AI関連の最新トピックを短く整理しました。</div>
+          </article>
+        </div>
       </section>
 
-      <aside class="reader" id="reader"></aside>
-    </main>
-  </div>
-
-  <button class="compose-fab" id="composeFab">＋ 作成</button>
-
-  <div class="compose-modal" id="composeModal" aria-hidden="true">
-    <div class="compose">
-      <div class="compose-head">
-        <h3>新規メッセージ</h3>
-        <button class="close-btn" id="closeCompose">×</button>
-      </div>
-      <div class="compose-body">
-        <div class="field">
-          <label>宛先</label>
-          <input type="email" placeholder="example@mail.com" />
-        </div>
-        <div class="field">
-          <label>件名</label>
-          <input type="text" placeholder="件名を入力" />
-        </div>
-        <div class="field">
-          <label>ラベル</label>
-          <select>
-            <option>仕事</option>
-            <option>個人</option>
-            <option>デザイン</option>
-            <option>重要</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>本文</label>
-          <textarea placeholder="ここに本文を書いてください..."></textarea>
-        </div>
-      </div>
-      <div class="compose-footer">
-        <div class="secondary-note">Gmailっぽく、でもちゃんと自分のもの。人類はすぐ既視感のあるUIを安心だと感じるので。</div>
-        <button class="compose-send" id="sendBtn">送信</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const mails = [
-      {
-        id: 1,
-        sender: 'Product Team',
-        email: 'product@company.jp',
-        subject: '来週のリリーススケジュールについて',
-        snippet: 'UIの最終確認をお願いします。素材の差し替えは明日15時までに反映できると助かります。',
-        time: '09:24',
-        date: '今日',
-        folder: 'inbox',
-        label: 'work',
-        unread: true,
-        starred: true,
-        body: [
-          'こんにちは。',
-          '来週公開予定の画面について、最終レビューをお願いしたいです。特にボタンの配置とモバイル表示の崩れがないかを見てください。',
-          '差し戻しがあれば今日中に共有できると助かります。よろしくお願いします。'
-        ]
-      },
-      {
-        id: 2,
-        sender: 'Design Lab',
-        email: 'hello@designlab.studio',
-        subject: '新しいカラーパレット案を送ります',
-        snippet: '彩度を少し抑えた案と、ビビッド寄りの案を2パターン用意しました。',
-        time: '08:10',
-        date: '今日',
-        folder: 'inbox',
-        label: 'design',
-        unread: true,
-        starred: false,
-        body: [
-          'いつもありがとうございます。',
-          '今回の提案では、深いネイビーをベースにした落ち着いた案と、アクセントを強めた活発な案をまとめています。',
-          'レビューしやすいように、ワイヤーと併記した資料も添付しています。'
-        ]
-      },
-      {
-        id: 3,
-        sender: 'Sato',
-        email: 'sato@example.com',
-        subject: '週末の予定、どうする？',
-        snippet: '駅近のカフェをいくつか見つけました。集合は昼前でも大丈夫です。',
-        time: '昨日',
-        date: '昨日',
-        folder: 'inbox',
-        label: 'personal',
-        unread: false,
-        starred: true,
-        body: [
-          'やあ。',
-          '週末の予定、まだ空いていたらカフェに行こうと思っています。',
-          '駅から近い場所をいくつか見つけたので、都合のいい方を選んでもらえたらうれしいです。'
-        ]
-      },
-      {
-        id: 4,
-        sender: 'Security Alert',
-        email: 'no-reply@security.jp',
-        subject: '新しい端末からのログインがありました',
-        snippet: '心当たりがない場合は、すぐにパスワードを変更してください。',
-        time: '1時間前',
-        date: '今日',
-        folder: 'inbox',
-        label: 'alert',
-        unread: true,
-        starred: false,
-        body: [
-          '新しい端末からのログインを検知しました。',
-          '心当たりがない場合は、アカウント設定からパスワードを変更し、二段階認証を有効にしてください。',
-          'この通知に返信する必要はありません。'
-        ]
-      },
-      {
-        id: 5,
-        sender: 'Nakamura',
-        email: 'naka@example.com',
-        subject: '資料の確認ありがとうございました',
-        snippet: '改善点の指摘、すごく助かりました。次の版に反映します。',
-        time: '月曜',
-        date: '月曜',
-        folder: 'sent',
-        label: 'work',
-        unread: false,
-        starred: false,
-        body: [
-          'レビューありがとうございました。',
-          'いただいたフィードバックをもとに、次の版では可読性と余白を調整します。',
-          '引き続きよろしくお願いします。'
-        ]
-      }
-    ];
-
-    const state = {
-      activeId: 1,
-      filter: 'all',
-      folder: 'inbox',
-      label: 'all',
-      query: ''
-    };
-
-    const mailList = document.getElementById('mailList');
-    const reader = document.getElementById('reader');
-    const searchInput = document.getElementById('searchInput');
-    const composeModal = document.getElementById('composeModal');
-    const inboxCount = document.getElementById('inboxCount');
-    const starCount = document.getElementById('starCount');
-
-    function initials(name) {
-      return name.split(/\s+/).map(s => s[0]).slice(0, 2).join('').toUpperCase();
-    }
-
-    function updateCounts() {
-      inboxCount.textContent = mails.filter(m => m.folder === 'inbox').length;
-      starCount.textContent = mails.filter(m => m.starred).length;
-    }
-
-    function matches(mail) {
-      const q = state.query.trim().toLowerCase();
-      const matchesQuery = !q || [mail.sender, mail.subject, mail.snippet, mail.email].join(' ').toLowerCase().includes(q);
-      const matchesFolder = state.folder === 'all' || mail.folder === state.folder;
-      const matchesLabel = state.label === 'all' || mail.label === state.label;
-      const matchesChip =
-        state.filter === 'all' ||
-        (state.filter === 'unread' && mail.unread) ||
-        (state.filter === 'starred' && mail.starred) ||
-        (state.filter === 'today' && mail.date === '今日');
-      return matchesQuery && matchesFolder && matchesLabel && matchesChip;
-    }
-
-    function renderList() {
-      const visible = mails.filter(matches);
-      mailList.innerHTML = visible.map(mail => `
-        <article class="mail-item ${mail.id === state.activeId ? 'active' : ''}" data-id="${mail.id}">
-          <div class="check"></div>
-          <div class="mail-main">
-            <div class="mail-row1">
-              <div class="sender">${mail.sender}${mail.unread ? ' <span style="color:#1a73e8">•</span>' : ''}</div>
-              <div class="time">${mail.time}</div>
-            </div>
-            <div class="subject">${mail.subject}</div>
-            <div class="snippet">${mail.snippet}</div>
-          </div>
-          <div class="badges">
-            ${mail.starred ? '<div class="star">★</div>' : '<div style="height:16px"></div>'}
-            <span class="mail-tag ${mail.label}">${mail.label}</span>
-          </div>
-        </article>
-      `).join('') || `
-        <div class="empty">
-          <div class="empty-card">
-            <div style="font-size:42px; margin-bottom:10px;">📭</div>
-            <h3 style="margin:0 0 8px;">該当するメールがありません</h3>
-            <p style="margin:0; line-height:1.7;">検索語かフィルタを変えると、たぶん人類にもまだ優しい結果が出ます。</p>
-          </div>
-        </div>
-      `;
-
-      mailList.querySelectorAll('.mail-item').forEach(item => {
-        item.addEventListener('click', () => {
-          state.activeId = Number(item.dataset.id);
-          const mail = mails.find(m => m.id === state.activeId);
-          if (mail) mail.unread = false;
-          updateCounts();
-          renderAll();
-        });
-      });
-    }
-
-    function renderReader() {
-      const mail = mails.find(m => m.id === state.activeId) || mails[0];
-      if (!mail) {
-        reader.innerHTML = '<div class="empty"><div class="empty-card">メールがありません。</div></div>';
-        return;
-      }
-
-      reader.innerHTML = `
+      <section class="reader">
         <div class="reader-head">
-          <div class="reader-title">
-            <div class="kicker">プレビュー</div>
-            <h2>${mail.subject}</h2>
-          </div>
-          <div class="reader-actions">
-            <button class="reader-btn" id="replyBtn">返信</button>
-            <button class="reader-btn" id="archiveSingleBtn">アーカイブ</button>
-            <button class="reader-btn" id="deleteSingleBtn">削除</button>
+          <div class="title-row">
+            <div>
+              <h2>メールを表示</h2>
+              <p class="small">選択中のメッセージの本文</p>
+            </div>
+            <div class="meta">受信: 2026/05/19 09:41</div>
           </div>
         </div>
+
         <div class="reader-body">
-          <div class="meta-line">
-            <div class="sender-card">
-              <div class="avatar">${initials(mail.sender)}</div>
-              <div class="sender-meta">
-                <strong>${mail.sender}</strong>
-                <span>${mail.email}</span>
+          <div class="mail-card">
+            <div class="hero">
+              <div class="sender">
+                <div class="avatar blue">A</div>
+                <div class="sender-info">
+                  <strong>Acme Team</strong>
+                  <div class="small">project@acme.example</div>
+                </div>
+              </div>
+              <div class="small">⭐ スターを付ける</div>
+            </div>
+
+            <h3 style="margin:16px 0 10px; font-size:1.35rem;">新しいダッシュボードのデザイン案を確認してください</h3>
+            <p class="small" style="margin-bottom:16px;">To: Qianyu Yang · Cc: design-team@acme.example</p>
+
+            <div class="body-text">
+              こんにちは。<br /><br />
+              週次レビューに向けて、ダッシュボードの最新案をまとめました。
+              ナビゲーションを左側に固定し、カードの階層を整理して、重要な数値がひと目で分かる構成にしています。
+              添付のモックアップを確認して、気になる点があればコメントしてください。
+              <br /><br />
+              ・配色はライト基調
+              ・通知は右上に集約
+              ・モバイルでも崩れにくいレスポンシブ対応
+              <br /><br />
+              これで、人類が毎回探し物をする悲しみが少し減るはずです。
+            </div>
+          </div>
+
+          <div class="mail-card">
+            <div class="small" style="margin-bottom:10px; font-weight:700; color:#111827;">添付ファイル</div>
+            <div class="attachment-row">
+              <div class="attachment">
+                <div style="font-weight:700;">wireframe-v3.pdf</div>
+                <div class="small">2.4 MB · PDF</div>
+              </div>
+              <div class="attachment">
+                <div style="font-weight:700;">ui-mockup.fig</div>
+                <div class="small">8.1 MB · Figma</div>
               </div>
             </div>
-            <div>${mail.date} ・ ${mail.time}</div>
           </div>
-          <div class="message-box">
-            ${mail.body.map(p => `<p>${p}</p>`).join('')}
-            <div class="signature">
-              送信元: ${mail.sender}<br>
-              ラベル: ${mail.label}
+
+          <div class="mail-card">
+            <div class="btn-row">
+              <button class="btn primary">返信</button>
+              <button class="btn">全員に返信</button>
+              <button class="btn">転送</button>
+              <button class="btn">アーカイブ</button>
             </div>
           </div>
         </div>
-      `;
 
-      document.getElementById('replyBtn').addEventListener('click', openCompose);
-      document.getElementById('archiveSingleBtn').addEventListener('click', () => alert('アーカイブしました。人類はたまに片付けを覚えます。'));
-      document.getElementById('deleteSingleBtn').addEventListener('click', deleteCurrentMail);
-    }
-
-    function renderAll() {
-      renderList();
-      renderReader();
-
-      document.querySelectorAll('.chip').forEach(chip => {
-        chip.classList.toggle('active', chip.dataset.filter === state.filter);
-      });
-      document.querySelectorAll('.label-chip').forEach(chip => {
-        chip.classList.toggle('active', chip.dataset.label === state.label);
-      });
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.folder === state.folder);
-      });
-    }
-
-    function openCompose() {
-      composeModal.classList.add('open');
-      composeModal.setAttribute('aria-hidden', 'false');
-    }
-
-    function closeCompose() {
-      composeModal.classList.remove('open');
-      composeModal.setAttribute('aria-hidden', 'true');
-    }
-
-    function deleteCurrentMail() {
-      const idx = mails.findIndex(m => m.id === state.activeId);
-      if (idx >= 0) {
-        mails.splice(idx, 1);
-        state.activeId = mails[0]?.id || null;
-        updateCounts();
-        renderAll();
-      }
-    }
-
-    document.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        state.filter = chip.dataset.filter;
-        renderAll();
-      });
-    });
-
-    document.querySelectorAll('.label-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        state.label = chip.dataset.label;
-        renderAll();
-      });
-    });
-
-    document.querySelectorAll('.nav-item').forEach(item => {
-      item.addEventListener('click', () => {
-        state.folder = item.dataset.folder;
-        renderAll();
-      });
-    });
-
-    searchInput.addEventListener('input', e => {
-      state.query = e.target.value;
-      renderAll();
-    });
-
-    document.getElementById('openCompose').addEventListener('click', openCompose);
-    document.getElementById('composeFab').addEventListener('click', openCompose);
-    document.getElementById('closeCompose').addEventListener('click', closeCompose);
-    document.getElementById('sendBtn').addEventListener('click', () => {
-      alert('送信しました。Gmailっぽい顔をしていますが、中身はちゃんとあなたのUIです。');
-      closeCompose();
-    });
-
-    document.getElementById('markAllRead').addEventListener('click', () => {
-      mails.forEach(m => m.unread = false);
-      updateCounts();
-      renderAll();
-    });
-
-    document.getElementById('archiveBtn').addEventListener('click', () => alert('アーカイブしました。見えなくなるだけで、現実は消えません。'));
-    document.getElementById('deleteBtn').addEventListener('click', deleteCurrentMail);
-    document.getElementById('selectAllBtn').addEventListener('click', () => alert('チェックボックスUIは飾りです。次に本物の選択機能を足しましょう。'));
-
-    composeModal.addEventListener('click', e => {
-      if (e.target === composeModal) closeCompose();
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeCompose();
-    });
-
-    updateCounts();
-    renderAll();
-  </script>
+        <div class="composer">
+          <div class="composer-grid">
+            <input type="text" placeholder="クイック返信を入力" />
+            <button class="send">送信</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
 </body>
 </html>
